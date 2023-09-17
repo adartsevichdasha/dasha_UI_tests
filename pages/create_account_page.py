@@ -2,6 +2,8 @@ from pages.base_page import BasePage
 from selenium.webdriver.common.by import By
 import random
 import string
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 button = (By.XPATH, '//*[@class="action submit primary"]')
@@ -51,11 +53,22 @@ class CreateAccountPage(BasePage):
         message = self.find(field_error_message)
         assert message.text == error_message
 
-    def successful_account_creation(self):
+    def clear_all_fields(self):
+        self.find(first_name).clear()
+        self.find(last_name).clear()
+        self.find(email).clear()
+        self.find(password).clear()
+        self.find(confirm_password).clear()
+
+    def successful_account_creation(self, text_message):
         value = self.get_random_values(8)
+        self.clear_all_fields()
         self.find(first_name).send_keys(value)
         self.find(last_name).send_keys(value)
         self.find(email).send_keys(f'{value}@test.com')
         self.find(password).send_keys(value)
         self.find(confirm_password).send_keys(value)
         self.find(button).click()
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH,
+                                                                              '//*[@data-ui-id="message-success"]')))
+        assert self.driver.find_element(By.XPATH, '//*[@data-ui-id="message-success"]').text == text_message

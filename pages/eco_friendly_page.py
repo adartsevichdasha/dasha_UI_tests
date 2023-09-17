@@ -1,6 +1,7 @@
 from pages.base_page import BasePage
 from selenium.webdriver.common.by import By
-from time import sleep
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 title_of_page = (By.XPATH, '//*[@data-ui-id="page-title-wrapper"]')
@@ -33,11 +34,12 @@ class EcoFriendlyPage(BasePage):
         self.driver.set_window_size(400, 700)
         self.find_all(add_button)[1].click()
         self.driver.maximize_window()
-        sleep(5)
+        WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.XPATH,
+                                                                              '//*[@data-ui-id="message-success"]')))
         self.find(show_button).click()
         added_item = self.find(added_product)
-        success_message = self.find(message)
-        assert success_message is not None
+        displayed_success_message = self.find(message)
+        assert displayed_success_message is not None
         assert added_item.text == item.text
 
     def clear_filter(self):
